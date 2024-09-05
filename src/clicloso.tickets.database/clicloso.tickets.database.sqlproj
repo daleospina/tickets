@@ -1,0 +1,103 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <Name>clicloso.tickets.database</Name>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectVersion>4.1</ProjectVersion>
+    <ProjectGuid>{0d7e3123-a478-44fc-8209-8fa511062689}</ProjectGuid>
+    <DSP>Microsoft.Data.Tools.Schema.Sql.SqlAzureV12DatabaseSchemaProvider</DSP>
+    <OutputType>Database</OutputType>
+    <RootPath>
+    </RootPath>
+    <RootNamespace>clicloso.tickets.database</RootNamespace>
+    <AssemblyName>clicloso.tickets.database</AssemblyName>
+    <ModelCollation>1033, CI</ModelCollation>
+    <DefaultFileStructure>BySchemaAndSchemaType</DefaultFileStructure>
+    <DeployToDatabase>True</DeployToDatabase>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <TargetLanguage>CS</TargetLanguage>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <SqlServerVerification>False</SqlServerVerification>
+    <IncludeCompositeObjects>True</IncludeCompositeObjects>
+    <TargetDatabaseSet>True</TargetDatabaseSet>
+    <SccProjectName>SAK</SccProjectName>
+    <SccProvider>SAK</SccProvider>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccLocalPath>SAK</SccLocalPath>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
+    <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <OutputPath>bin\Debug\</OutputPath>
+    <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">11.0</VisualStudioVersion>
+    <!-- Default to the v11.0 targets path if the targets file for the current VS version is not found -->
+    <SSDTExists Condition="Exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets')">True</SSDTExists>
+    <VisualStudioVersion Condition="'$(SSDTExists)' == ''">11.0</VisualStudioVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Test|AnyCPU' ">
+    <OutputPath>bin\Release\</OutputPath>
+    <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
+    <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <Import Condition="'$(SQLDBExtensionsRefPath)' != ''" Project="$(SQLDBExtensionsRefPath)\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
+  <Import Condition="'$(SQLDBExtensionsRefPath)' == ''" Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
+  <ItemGroup>
+    <Folder Include="Properties" />
+    <Folder Include="tables" />
+    <Folder Include="store procedures" />
+  </ItemGroup>
+  <ItemGroup>
+    <Build Include="tables\city.sql" />
+    <Build Include="tables\customer.sql" />
+    <Build Include="store procedures\uspaddcity.sql" />
+    <Build Include="store procedures\uspaddcustomer.sql" />
+    <Build Include="store procedures\uspaddtheater.sql" />
+    <Build Include="store procedures\uspdeletecity.sql" />
+    <Build Include="store procedures\uspdeletecustomer.sql" />
+    <Build Include="store procedures\uspdeletetheater.sql" />
+    <Build Include="store procedures\uspgetcity.sql" />
+    <Build Include="store procedures\uspgetcustomer.sql" />
+    <Build Include="store procedures\uspgetlistcity.sql" />
+    <Build Include="store procedures\uspgetlistcustomer.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <RefactorLog Include="clicloso.tickets.database.refactorlog" />
+  </ItemGroup>
+  <ItemGroup>
+    <Build Include="tables\theater.sql" />
+    <Build Include="store procedures\uspgetlisttheater.sql" />
+    <Build Include="store procedures\uspgettheater.sql" />
+    <Build Include="store procedures\uspupdatecity.sql" />
+    <Build Include="store procedures\uspupdatecustomer.sql" />
+    <Build Include="store procedures\uspupdatetheater.sql" />
+  </ItemGroup>
+</Project>

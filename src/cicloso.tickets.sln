@@ -1,0 +1,82 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30011.22
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "clicloso.tickets.database", "clicloso.tickets.database\clicloso.tickets.database.sqlproj", "{0D7E3123-A478-44FC-8209-8FA511062689}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cicloso.tickets.portal", "cicloso.tickets.portal\cicloso.tickets.portal.csproj", "{8633BD81-9A34-4211-9590-B69F27E4380B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cicloso.tickets.core", "cicloso.tickets.core\cicloso.tickets.core.csproj", "{C4AC80E1-0338-4569-A2FB-484BDD323388}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cicloso.tickets.entities", "cicloso.tickets.entities\cicloso.tickets.entities.csproj", "{5248162D-61CA-4B9E-8552-1E671091F0BC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cicloso.tickets.tests", "cicloso.tickets.tests\cicloso.tickets.tests.csproj", "{48280622-5A3B-4406-A171-162C35185F7D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cicloso.tickets.api", "cicloso.tickets.api\cicloso.tickets.api.csproj", "{BA05E76A-18FE-457F-B7A4-A427557B94DE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0D7E3123-A478-44FC-8209-8FA511062689}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0D7E3123-A478-44FC-8209-8FA511062689}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0D7E3123-A478-44FC-8209-8FA511062689}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{0D7E3123-A478-44FC-8209-8FA511062689}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0D7E3123-A478-44FC-8209-8FA511062689}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0D7E3123-A478-44FC-8209-8FA511062689}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{8633BD81-9A34-4211-9590-B69F27E4380B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8633BD81-9A34-4211-9590-B69F27E4380B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8633BD81-9A34-4211-9590-B69F27E4380B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8633BD81-9A34-4211-9590-B69F27E4380B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C4AC80E1-0338-4569-A2FB-484BDD323388}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C4AC80E1-0338-4569-A2FB-484BDD323388}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C4AC80E1-0338-4569-A2FB-484BDD323388}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C4AC80E1-0338-4569-A2FB-484BDD323388}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5248162D-61CA-4B9E-8552-1E671091F0BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5248162D-61CA-4B9E-8552-1E671091F0BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5248162D-61CA-4B9E-8552-1E671091F0BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5248162D-61CA-4B9E-8552-1E671091F0BC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{48280622-5A3B-4406-A171-162C35185F7D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{48280622-5A3B-4406-A171-162C35185F7D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{48280622-5A3B-4406-A171-162C35185F7D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{48280622-5A3B-4406-A171-162C35185F7D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BA05E76A-18FE-457F-B7A4-A427557B94DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BA05E76A-18FE-457F-B7A4-A427557B94DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BA05E76A-18FE-457F-B7A4-A427557B94DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BA05E76A-18FE-457F-B7A4-A427557B94DE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {89DE4957-F070-47EB-B44E-83C0C2358A9E}
+		EnterpriseLibraryConfigurationToolBinariesPathV6 = packages\EnterpriseLibrary.Common.6.0.1304.0\lib\NET45;packages\EnterpriseLibrary.Data.6.0.1304.0\lib\NET45
+	EndGlobalSection
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 7
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = https://cicloso.visualstudio.com/
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = clicloso.tickets.database\\clicloso.tickets.database.sqlproj
+		SccProjectName1 = clicloso.tickets.database
+		SccLocalPath1 = clicloso.tickets.database
+		SccProjectUniqueName2 = cicloso.tickets.portal\\cicloso.tickets.portal.csproj
+		SccProjectName2 = cicloso.tickets.portal
+		SccLocalPath2 = cicloso.tickets.portal
+		SccProjectUniqueName3 = cicloso.tickets.core\\cicloso.tickets.core.csproj
+		SccProjectName3 = cicloso.tickets.core
+		SccLocalPath3 = cicloso.tickets.core
+		SccProjectUniqueName4 = cicloso.tickets.entities\\cicloso.tickets.entities.csproj
+		SccProjectName4 = cicloso.tickets.entities
+		SccLocalPath4 = cicloso.tickets.entities
+		SccProjectUniqueName5 = cicloso.tickets.tests\\cicloso.tickets.tests.csproj
+		SccProjectName5 = cicloso.tickets.tests
+		SccLocalPath5 = cicloso.tickets.tests
+		SccProjectUniqueName6 = cicloso.tickets.api\\cicloso.tickets.api.csproj
+		SccProjectName6 = cicloso.tickets.api
+		SccLocalPath6 = cicloso.tickets.api
+	EndGlobalSection
+EndGlobal
