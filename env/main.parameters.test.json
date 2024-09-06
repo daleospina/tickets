@@ -1,0 +1,79 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "globalLocation":{
+        "value": "global"
+      },
+      "replicaLocation": {
+        "value": "westus"
+      },
+      "prefix": {
+        "value": "tickets"
+      },
+      "environment": {
+        "value": "test"
+      },
+      "resourceGroupInitName": {
+        "value": "rg-tickets-init"
+      },
+      "managedIdentityName": {
+        "value": "id-tickets-init"
+      },
+      "certificateSSL": {
+        "value": "https://kv-tickets-init.vault.azure.net/secrets/certificateSSLFile/379c92857c9346fba7c27bfd63c95c29"
+      },
+      "workSpaceSkuName": {
+        "value": "PerGB2018"
+      },
+      "appServicePlanSkuName": {
+        "value": "B1"
+      },
+      "sqlServerAdminUser": {
+        "reference": {
+          "keyVault": {
+            "id": "/subscriptions/4db78a78-3084-43d5-a503-3486f0427890/resourceGroups/rg-tickets-init/providers/Microsoft.KeyVault/vaults/kv-tickets-init"
+          },
+          "secretName": "sqlServerAdministratorLogin"
+        }
+      },
+      "sqlServerAdminPassword": {
+        "reference": {
+          "keyVault": {
+            "id": "/subscriptions/4db78a78-3084-43d5-a503-3486f0427890/resourceGroups/rg-tickets-init/providers/Microsoft.KeyVault/vaults/kv-tickets-init"
+          },
+          "secretName": "sqlServerAdministratorPassword"
+        }
+      },
+      "sqlServerAdminLogin": {
+        "value": "APP_AAD_TechnicalGovernance_ApplicationServices_Members"
+      },
+      "sqlServerAdminSID": {
+        "value": "47b9bfba-1d76-41b3-b295-186981d614dc"
+      },
+      "sqlServerAdminType": {
+        "value": "Group"
+      },
+      "sqlDataBaseSkuName": {
+        "value": "Basic"
+      },
+      "storageAccountSkuName": {
+        "value": "Standard_LRS"
+      },
+      "publicIPAddressSkuName": {
+        "value": "Standard"
+      },
+      "publicIPAddressVersion": {
+        "value": "IPv4"
+      },
+      "publicIPAllocationMethod": {
+        "value": "Static"
+      },
+      "applicationGateWaySkuName": {
+        "value": "Standard_v2"
+      },
+      "virtualNetworkSegment": {
+        "value": 1
+      }
+    }
+  }
