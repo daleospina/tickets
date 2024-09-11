@@ -286,3 +286,7 @@ module appGateways 'modules/appGateways.bicep' = {
     storageAccounts
   ]
 }
+
+output appHostName string = appServices.outputs.appHostName
+output apiHostName string = appServices.outputs.apiHostName
+output sqlServerName string = sqlDatabases.outputs.serverFQDN
