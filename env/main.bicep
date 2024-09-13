@@ -126,7 +126,7 @@ param workSpaceName string = 'log-${prefix}-${environment}-${suffix}'
 param appInsightsName string = 'appi-${prefix}-${environment}-${suffix}'
 
 @description('Service plan name that contain application services.')
-param appServicePlanName string = 'asp-${prefix}-${environment}-${suffix}'
+param appServicePlanName string = 'asp-${prefix}-windows-${environment}-${suffix}'
 
 @description('Application service name for api.')
 param appServiceApiName string = 'app-${prefix}-api-${environment}-${suffix}'
@@ -290,3 +290,4 @@ module appGateways 'modules/appGateways.bicep' = {
 output appHostName string = appServices.outputs.appName
 output apiHostName string = appServices.outputs.apiName
 output sqlServerName string = sqlDatabases.outputs.serverFQDN
+output sqlDatabaseName string = sqlDatabases.outputs.databaseName

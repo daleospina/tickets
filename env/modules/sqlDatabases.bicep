@@ -235,3 +235,4 @@ resource privateDnsZoneGroupSqlReplica 'Microsoft.Network/privateEndpoints/priva
 
 // Outputs
 output serverFQDN string = sqlServer.properties.fullyQualifiedDomainName
+output databaseName string = sqlDataBase.name
