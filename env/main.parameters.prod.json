@@ -27,7 +27,7 @@
         "value": "PerGB2018"
       },
       "appServicePlanSkuName": {
-        "value": "B1"
+        "value": "P1V2"
       },
       "sqlServerAdminUser": {
         "reference": {
