@@ -5,9 +5,6 @@
       "globalLocation":{
         "value": "global"
       },
-      "replicaLocation": {
-        "value": "westus"
-      },
       "prefix": {
         "value": "tickets"
       },

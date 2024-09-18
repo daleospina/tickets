@@ -2,9 +2,6 @@
 @description('Global location name')
 param globalLocation string
 
-@description('Replica location name.')
-param replicaLocation string
-
 @description('Resource location name.')
 param resourceLocation string = resourceGroup().location
 
@@ -137,17 +134,11 @@ param appServiceAppName string = 'app-${prefix}-app-${environment}-${suffix}'
 @description('SQL logical server name.')
 param sqlServerName string = 'sql-${prefix}-${environment}-${suffix}'
 
-@description('SQL logical server replica name.')
-param sqlServerReplicaName string = 'sql-${prefix}-replica-${environment}-${suffix}'
-
 @description('SQL database name.')
 param sqlDataBaseName string = 'sqldb-${prefix}-${environment}'
 
 @description('Private sql endpoint name')
 param privateEndpointSqlName string = 'pe-${prefix}-sql-${environment}-${suffix}'
-
-@description('Private sql endpoint replica name')
-param privateEndpointSqlReplicaName string = 'pe-${prefix}-sql-replica-${environment}-${suffix}'
 
 @description('Private link database name')
 param privateDnsZoneSqlName string = 'privatelink.database.windows.net'
@@ -194,7 +185,6 @@ module appInsights 'modules/appInsights.bicep' = {
   name: 'appInsights'
   params: {
     appInsightsName: appInsightsName
-    environment: environment
     resourceLocation: resourceLocation
     workSpaceSkuName: workSpaceSkuName
     workSpaceName: workSpaceName
@@ -211,7 +201,6 @@ module appServices 'modules/appServices.bicep' = {
     appServicePlanName: appServicePlanName
     appServicePlanSkuName: appServicePlanSkuName
     computeSubnetId: virtualNetworks.outputs.computeSubnetId
-    environment: environment
     resourceLocation: resourceLocation
   }
 }
@@ -219,14 +208,10 @@ module appServices 'modules/appServices.bicep' = {
 module sqlDatabases 'modules/sqlDatabases.bicep' = {
   name: 'sqlDatabases'
   params: {
-    dataReplicaSubnetId: virtualNetworks.outputs.dataReplicaSubnetId 
     dataSubnetId: virtualNetworks.outputs.dataSubnetId
-    environment: environment
     globalLocation: globalLocation
     privateDnsZoneSqlName: privateDnsZoneSqlName
     privateEndpointSqlName: privateEndpointSqlName
-    privateEndpointSqlReplicaName: privateEndpointSqlReplicaName
-    replicaLocation: replicaLocation
     resourceLocation: resourceLocation
     sqlDataBaseName: sqlDataBaseName
     sqlDataBaseSkuName: sqlDataBaseSkuName
@@ -236,7 +221,6 @@ module sqlDatabases 'modules/sqlDatabases.bicep' = {
     sqlServerAdminType: sqlServerAdminType
     sqlServerAdminUser: sqlServerAdminUser
     sqlServerName: sqlServerName
-    sqlServerReplicaName: sqlServerReplicaName
     virtualNetworkId: virtualNetworks.outputs.virtualNetworkId
     virtualNetworkName: virtualNetworks.outputs.virtualNetworkName
   }
@@ -246,7 +230,6 @@ module storageAccounts 'modules/storageAccounts.bicep' = {
   name: 'storageAccounts'
   params: {
     blobContainerName: blobContainerName
-    environment: environment
     fileShareName: fileShareName
     globalLocation: globalLocation
     storageAccountName: storageAccountName 

@@ -5,9 +5,6 @@
       "globalLocation":{
         "value": "global"
       },
-      "replicaLocation": {
-        "value": "westus"
-      },
       "prefix": {
         "value": "tickets"
       },
@@ -27,7 +24,7 @@
         "value": "PerGB2018"
       },
       "appServicePlanSkuName": {
-        "value": "P1V2"
+        "value": "B1"
       },
       "sqlServerAdminUser": {
         "reference": {

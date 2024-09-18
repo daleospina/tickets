@@ -2,13 +2,6 @@
 @description('Location for all resources.')
 param resourceLocation string
 
-@description('Environment for all resources.')
-@allowed([
-  'test'
-  'prod'
-])
-param environment string
-
 @description('Workspace name that contain application insights.')
 param workSpaceName string
 

@@ -11,9 +11,9 @@ param virtualNetworkSegment int
 // Variables
 var appGatewaySubnetName = 'agsubnet'
 var computeSubnetName = 'computesubnet'
-var dataSubnetName = 'datasubnet'
-var dataReplicaSubnetName = 'datareplicasubnet'
 var storageSubnetName = 'storagesubnet'
+var dataSubnetName = 'datasubnet'
+
 
 resource vNet 'Microsoft.Network/virtualNetworks@2023-09-01' = {
   name: virtualNetworkName
@@ -47,21 +47,15 @@ resource vNet 'Microsoft.Network/virtualNetworks@2023-09-01' = {
         }
       }
       {
-        name: dataSubnetName
+        name: storageSubnetName
         properties: {
           addressPrefix: '10.${virtualNetworkSegment}.2.0/24'
         }
       }
       {
-        name: dataReplicaSubnetName
+        name: dataSubnetName
         properties: {
           addressPrefix: '10.${virtualNetworkSegment}.3.0/24'
-        }
-      }
-      {
-        name: storageSubnetName
-        properties: {
-          addressPrefix: '10.${virtualNetworkSegment}.4.0/24'
         }
       }
     ] 
@@ -75,16 +69,12 @@ resource vNet 'Microsoft.Network/virtualNetworks@2023-09-01' = {
     name: computeSubnetName
   }
 
-  resource dataSubnet 'subnets' existing = {
-    name: dataSubnetName
-  }
-
-  resource dataReplicaSubnet 'subnets' existing = {
-    name: dataReplicaSubnetName
-  }
-
   resource storageSubnet 'subnets' existing = {
     name: storageSubnetName
+  }
+
+  resource dataSubnet 'subnets' existing = {
+    name: dataSubnetName
   }
 }
 
@@ -95,9 +85,7 @@ output appGatewaySubnetId string =  vNet::appGatewaySubnet.id
 output appGatewaySubnetName string = vNet::appGatewaySubnet.name
 output computeSubnetId string = vNet::computeSubnet.id
 output computeSubnetName string = vNet::computeSubnet.name
-output dataSubnetId string = vNet::dataSubnet.id
-output dataSubnetName string = vNet::dataSubnet.name
-output dataReplicaSubnetId string = vNet::dataReplicaSubnet.id
-output dataReplicaSubnetName string = vNet::dataReplicaSubnet.name
 output storageSubnetId string = vNet::storageSubnet.id
 output storageSubnetName string = vNet::storageSubnet.name
+output dataSubnetId string = vNet::dataSubnet.id
+output dataSubnetName string = vNet::dataSubnet.name

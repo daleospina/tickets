@@ -5,13 +5,6 @@ param resourceLocation string
 @description('Global location name')
 param globalLocation string
 
-@description('Environment for all resources.')
-@allowed([
-  'test'
-  'prod'
-])
-param environment string
-
 @description('Azure storage account name.')
 param storageAccountName string 
 
