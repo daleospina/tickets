@@ -2,13 +2,6 @@
 @description('Location for all resources.')
 param resourceLocation string
 
-@description('Environment for all resources.')
-@allowed([
-  'test'
-  'prod'
-])
-param environment string
-
 @description('Service plan name that contain application services.')
 param appServicePlanName string 
 
@@ -92,45 +85,6 @@ resource appServiceApi 'Microsoft.Web/sites@2023-01-01' = {
   }
 }
 
-resource stagingSlotApi 'Microsoft.Web/sites/slots@2023-12-01' = if(environment=='prod') {
-  name: 'staging'
-  parent: appServiceApi
-  location: resourceLocation
-  identity: {
-    type: 'SystemAssigned'
-  }
-  properties: {
-    serverFarmId: appServicePlan.id
-    httpsOnly: true
-    virtualNetworkSubnetId: computeSubnetId
-    vnetRouteAllEnabled: true
-    siteConfig:{
-      appSettings:[
-        {
-          name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
-          value:  appInsightInstrumentationKey
-        }
-        {
-          name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
-          value: appInsightConnectionString
-        }
-        {
-          name: 'ApplicationInsightsAgent_EXTENSION_VERSION'
-          value: '~3'
-        }
-        {
-          name: 'XDT_MicrosoftApplicationInsights_Mode'
-          value: 'recommended'
-        }
-        {
-          name: 'SCM_DO_BUILD_DURING_DEPLOYMENT'
-          value: 'true'
-        }
-      ]
-    }
-  }
-}
-
 resource appServiceApp 'Microsoft.Web/sites@2023-01-01' = {
   name: appServiceAppName
   location: resourceLocation
@@ -173,45 +127,6 @@ resource appServiceApp 'Microsoft.Web/sites@2023-01-01' = {
       appSettingNames: [
         'APPINSIGHTS_INSTRUMENTATIONKEY'
         'APPLICATIONINSIGHTS_CONNECTION_STRING'
-      ]
-    }
-  }
-}
-
-resource stagingSlotApp 'Microsoft.Web/sites/slots@2023-12-01' = if(environment=='prod') {
-  name: 'staging'
-  parent: appServiceApp
-  location: resourceLocation
-  identity: {
-    type: 'SystemAssigned'
-  }
-  properties: {
-    serverFarmId: appServicePlan.id
-    httpsOnly: true
-    virtualNetworkSubnetId: computeSubnetId
-    vnetRouteAllEnabled: true
-    siteConfig:{
-      appSettings:[
-        {
-          name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
-          value:  appInsightInstrumentationKey
-        }
-        {
-          name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
-          value: appInsightConnectionString
-        }
-        {
-          name: 'ApplicationInsightsAgent_EXTENSION_VERSION'
-          value: '~3'
-        }
-        {
-          name: 'XDT_MicrosoftApplicationInsights_Mode'
-          value: 'recommended'
-        }
-        {
-          name: 'SCM_DO_BUILD_DURING_DEPLOYMENT'
-          value: 'true'
-        }
       ]
     }
   }
