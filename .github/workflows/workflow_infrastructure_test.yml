@@ -1,0 +1,135 @@
+name: Build and Deploy Infra (Test)
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "dev/**"
+    paths:
+      - "env/**"
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  TEMPLATE_FILE: ./env/main.bicep
+  PARAMETER_TEST_FILE: ./env/main.parameters.test.json
+
+jobs:
+  
+  build-script:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Build bicep
+        run: az bicep build --file ${{ env.TEMPLATE_FILE }}
+  
+
+  create-resource-group-in-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: build-script
+    environment: test
+    steps:
+      - name: Sign in to azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Create resource group
+        uses: azure/CLI@v2
+        with:
+          inlineScript: |
+            az group create --name  ${{ vars.AZURE_RESOURCEGROUP_NAME }} --location ${{ vars.AZURE_LOCATION_NAME }}     
+  
+  whatif-to-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: test
+    needs: create-resource-group-in-test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Sign in to azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Validate bicep
+        uses: azure/bicep-deploy@v2
+        with:
+          type: deployment
+          operation: validate
+          scope: resourceGroup
+          name: ${{ github.run_number }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          resource-group-name: ${{ vars.AZURE_RESOURCEGROUP_NAME }}
+          template-file: ${{ env.TEMPLATE_FILE }}
+          parameters-file: ${{ env.PARAMETER_TEST_FILE }}
+
+      - name: Check whatif bicep
+        uses: azure/bicep-deploy@v2
+        with:
+          type: deployment
+          operation: whatIf
+          scope: resourceGroup
+          name: ${{ github.run_number }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          resource-group-name: ${{ vars.AZURE_RESOURCEGROUP_NAME }}
+          template-file: ${{ env.TEMPLATE_FILE }}
+          parameters-file: ${{ env.PARAMETER_TEST_FILE }}
+
+  deploy-to-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: test
+    needs: whatif-to-test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Sign in to azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Validate bicep
+        uses: azure/bicep-deploy@v2
+        with:
+          type: deployment
+          operation: validate
+          scope: resourceGroup
+          name: ${{ github.run_number }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          resource-group-name: ${{ vars.AZURE_RESOURCEGROUP_NAME }}
+          template-file: ${{ env.TEMPLATE_FILE }}
+          parameters-file: ${{ env.PARAMETER_TEST_FILE }}
+
+      - name: Deploy to azure
+        id: deploy
+        uses: azure/bicep-deploy@v2
+        with:
+          type: deployment
+          operation: create
+          scope: resourceGroup
+          name: ${{ github.run_number }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          resource-group-name: ${{ vars.AZURE_RESOURCEGROUP_NAME }}
+          template-file: ${{ env.TEMPLATE_FILE }}
+          parameters-file: ${{ env.PARAMETER_TEST_FILE }}
+
+    outputs:
+      appHostName: ${{ steps.deploy.outputs.appHostName }}
+      apiHostName: ${{ steps.deploy.outputs.apiHostName }}
+      sqlServerName: ${{ steps.deploy.outputs.sqlServerName }}
+      sqlDatabaseName: ${{ steps.deploy.outputs.sqlDatabaseName }}
