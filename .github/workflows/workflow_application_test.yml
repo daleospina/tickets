@@ -126,7 +126,7 @@ jobs:
             -Dsonar.organization=daleospina
             -Dsonar.projectName=cicloso-tickets
             -Dsonar.projectKey=cicloso-tickets
-            -Dsonar.test.exclusions=**/cicloso.tickets.core/**
+            -Dsonar.sources=./src
             -Dsonar.verbose=true
 
   # ========== TEST ENVIRONMENT DEPLOYMENT ==========
