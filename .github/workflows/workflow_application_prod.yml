@@ -1,0 +1,248 @@
+name: Build and Deploy App (Test)
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "master"
+    paths:
+      - "src/cicloso.tickets.api/**"
+      - "src/cicloso.tickets.portal/**"
+      - "src/cicloso.tickets.core/**"
+      - "src/cicloso.tickets.entities/**"
+      - "src/clicloso.tickets.database/**"
+
+env:
+  CONFIGURATION: Release
+  WORKING_DIRECTORY: ./src
+  API_PROJECT: cicloso.tickets.api
+  PORTAL_PROJECT: cicloso.tickets.portal
+  DATABASE_PROJECT: clicloso.tickets.database
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  # ========== BUILD JOBS ==========
+  build-api:
+    runs-on: windows-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v1.3.1
+
+      - name: Setup NuGet
+        uses: NuGet/setup-nuget@v1.2.0
+
+      - name: Restore NuGet packages
+        run: nuget restore "${{ env.WORKING_DIRECTORY }}\cicloso.tickets.sln"
+
+      - name: Build API project
+        run: msbuild "${{ env.WORKING_DIRECTORY }}\${{ env.API_PROJECT }}\${{ env.API_PROJECT }}.csproj" /p:Configuration=${{ env.CONFIGURATION }} /p:Platform="AnyCPU"
+
+      - name: Publish API
+        run: msbuild "${{ env.WORKING_DIRECTORY }}\${{ env.API_PROJECT }}\${{ env.API_PROJECT }}.csproj" /p:Configuration=${{ env.CONFIGURATION }} /p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true  /p:PublishUrl="${{ env.WORKING_DIRECTORY }}\${{ env.API_PROJECT }}\publish"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-artifact
+          path: ${{ env.WORKING_DIRECTORY }}/api-artifact.zip
+          retention-days: 1
+
+  build-portal:
+    runs-on: windows-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v1.3.1
+
+      - name: Setup NuGet
+        uses: NuGet/setup-nuget@v1.2.0
+
+      - name: Restore NuGet packages
+        run: nuget restore "${{ env.WORKING_DIRECTORY }}\cicloso.tickets.sln"
+
+      - name: Build Portal project
+        run: msbuild "${{ env.WORKING_DIRECTORY }}\${{ env.PORTAL_PROJECT }}\${{ env.PORTAL_PROJECT }}.csproj" /p:Configuration=${{ env.CONFIGURATION }} /p:Platform="AnyCPU"
+
+      - name: Publish Portal
+        run: msbuild "${{ env.WORKING_DIRECTORY }}\${{ env.PORTAL_PROJECT }}\${{ env.PORTAL_PROJECT }}.csproj" /p:Configuration=${{ env.CONFIGURATION }} /p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:PublishUrl="${{ env.WORKING_DIRECTORY }}\${{ env.PORTAL_PROJECT }}\publish"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: portal-artifact
+          path: ${{ env.WORKING_DIRECTORY }}/portal-artifact.zip
+          retention-days: 1
+
+  build-database:
+    runs-on: windows-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v1.3.1
+
+      - name: Build SQL Server Database project
+        run: msbuild "${{ env.WORKING_DIRECTORY }}\${{ env.DATABASE_PROJECT }}\${{ env.DATABASE_PROJECT }}.sqlproj" /p:Configuration=${{ env.CONFIGURATION }}
+
+      - name: Upload DACPAC artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: database-artifact
+          path: ${{ env.WORKING_DIRECTORY }}/${{ env.DATABASE_PROJECT }}/bin/${{ env.CONFIGURATION }}/*.dacpac
+          retention-days: 1
+
+  scan-code:
+      runs-on: ubuntu-latest
+      needs: [build-api, build-portal, build-database]
+      steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          # Disabling shallow clones is recommended for improving the relevancy of reporting
+          fetch-depth: 0
+
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v7.0.0 # Ex: v4.1.0 or sha1, See the latest version at https://github.com/marketplace/actions/official-sonarqube-scan
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          projectBaseDir: ${{ env.WORKING_DIRECTORY }}
+          args: >
+            -Dsonar.organization=daleospina
+            -Dsonar.projectName=cicloso-tickets
+            -Dsonar.projectKey=cicloso-tickets
+            -Dsonar.sources=.
+            -Dsonar.verbose=true
+
+  # ========== TEST ENVIRONMENT DEPLOYMENT ==========
+  # deploy-api-test:
+  #   runs-on: windows-latest
+  #   timeout-minutes: 30
+  #   needs: build-api
+  #   environment: test
+  #   if: contains(github.ref, 'dev/')
+
+  #   steps:
+  #     - name: Download artifact
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         name: api-artifact
+  #         path: ./artifact
+
+  #     - name: Log in with Azure
+  #       uses: azure/login@v2
+  #       with:
+  #         client-id: ${{ secrets.AZURE_CLIENT_ID }}
+  #         tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+  #         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      
+  #     - name: Deploy App 1 to Azure
+  #       uses: azure/webapps-deploy@v2
+  #       with:
+  #         app-name: 'YourAppServiceName1' # Replace with your Azure App Service name for App 1
+
+  #         publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE_APP1 }} # Use the secret you created
+  #         package: 'site_output_app1'
+
+  #     - name: Deploy API to Azure App Service
+  #       run: |
+  #         az webapp deployment source config-zip `
+  #           --resource-group ${{ vars.AZURE_RESOURCEGROUP_NAME }} `
+  #           --name ${{ vars.AZURE_API_APPSERVICE_NAME }} `
+  #           --src-path ./artifact/api-artifact.zip
+
+  #     - name: Verify API deployment
+  #       run: |
+  #         az webapp show `
+  #           --resource-group ${{ vars.AZURE_RESOURCEGROUP_NAME }} `
+  #           --name ${{ vars.AZURE_API_APPSERVICE_NAME }} `
+  #           --query state
+
+  # deploy-portal-test:
+  #   runs-on: windows-latest
+  #   timeout-minutes: 30
+  #   needs: build-portal
+  #   environment: test
+  #   if: contains(github.ref, 'dev/')
+
+  #   steps:
+  #     - name: Download artifact
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         name: portal-build
+  #         path: ./artifact
+
+  #     - name: Log in with Azure
+  #       uses: azure/login@v2
+  #       with:
+  #         client-id: ${{ secrets.AZURE_CLIENT_ID }}
+  #         tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+  #         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+  #     - name: Deploy Portal to Azure App Service
+  #       run: |
+  #         az webapp deployment source config-zip `
+  #           --resource-group ${{ vars.AZURE_RESOURCEGROUP_NAME }} `
+  #           --name ${{ vars.AZURE_PORTAL_APPSERVICE_NAME }} `
+  #           --src-path ./artifact/portal-artifact.zip
+
+  #     - name: Verify Portal deployment
+  #       run: |
+  #         az webapp show `
+  #           --resource-group ${{ vars.AZURE_RESOURCEGROUP_NAME }} `
+  #           --name ${{ vars.AZURE_PORTAL_APPSERVICE_NAME }} `
+  #           --query state
+
+  # deploy-database-test:
+  #   runs-on: windows-latest
+  #   timeout-minutes: 30
+  #   needs: build-database
+  #   environment: test
+
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
+
+  #     - name: Download DACPAC artifact
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         name: database-build
+  #         path: ./database-artifact
+
+  #     - name: Log in with Azure
+  #       uses: azure/login@v2
+  #       with:
+  #         client-id: ${{ secrets.AZURE_CLIENT_ID }}
+  #         tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+  #         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+  #     - name: Azure SQL Deploy
+  #       uses: Azure/sql-action@v2.3
+  #       with:
+  #         connection-string: '${{ vars.AZURE_SQL_CONNECTION_STRING }}'
+  #         path: './DBADirectory.dacpac'
+  #         action: publish
+  #         arguments: '/p:DropObjectsNotInSource=true'
+
+  #     - name: Verify database deployment
+  #       run: |
+  #         az sql db show `
+  #           --resource-group ${{ vars.AZURE_RESOURCEGROUP_NAME }} `
+  #           --server ${{ vars.AZURE_SQL_SERVER_NAME }} `
+  #           --name ${{ vars.AZURE_SQL_DATABASE_NAME }} `
+  #           --query status
