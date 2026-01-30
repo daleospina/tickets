@@ -46,7 +46,7 @@ jobs:
         run: msbuild "${{ env.WORKING_DIRECTORY }}\${{ env.API_PROJECT }}\${{ env.API_PROJECT }}.csproj" /p:Configuration=${{ env.CONFIGURATION }} /p:Platform="AnyCPU"
 
       - name: Publish API
-        run: msbuild "${{ env.WORKING_DIRECTORY }}\${{ env.API_PROJECT }}\${{ env.API_PROJECT }}.csproj" /p:Configuration=${{ env.CONFIGURATION }} /p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true"
+        run: msbuild "${{ env.WORKING_DIRECTORY }}\${{ env.API_PROJECT }}\${{ env.API_PROJECT }}.csproj" /p:Configuration=${{ env.CONFIGURATION }} /p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -76,7 +76,7 @@ jobs:
         run: msbuild "${{ env.WORKING_DIRECTORY }}\${{ env.PORTAL_PROJECT }}\${{ env.PORTAL_PROJECT }}.csproj" /p:Configuration=${{ env.CONFIGURATION }} /p:Platform="AnyCPU"
 
       - name: Publish Portal
-        run: msbuild "${{ env.WORKING_DIRECTORY }}\${{ env.PORTAL_PROJECT }}\${{ env.PORTAL_PROJECT }}.csproj" /p:Configuration=${{ env.CONFIGURATION }} /p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true"
+        run: msbuild "${{ env.WORKING_DIRECTORY }}\${{ env.PORTAL_PROJECT }}\${{ env.PORTAL_PROJECT }}.csproj" /p:Configuration=${{ env.CONFIGURATION }} /p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
