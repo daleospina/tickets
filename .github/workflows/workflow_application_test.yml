@@ -46,13 +46,13 @@ jobs:
         run: msbuild "${{ env.WORKING_DIRECTORY }}\${{ env.API_PROJECT }}\${{ env.API_PROJECT }}.csproj" /p:Configuration=${{ env.CONFIGURATION }} /p:Platform="AnyCPU"
 
       - name: Publish API
-        run: msbuild "${{ env.WORKING_DIRECTORY }}\${{ env.API_PROJECT }}\${{ env.API_PROJECT }}.csproj" /p:Configuration=${{ env.CONFIGURATION }} /p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true  /p:PublishUrl="${{ env.WORKING_DIRECTORY }}\${{ env.API_PROJECT }}\publish"
+        run: msbuild "${{ env.WORKING_DIRECTORY }}\${{ env.API_PROJECT }}\${{ env.API_PROJECT }}.csproj" /p:Configuration=${{ env.CONFIGURATION }} /p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: api-artifact
-          path: ${{ env.WORKING_DIRECTORY }}/api-artifact.zip
+          path: ${{ env.WORKING_DIRECTORY }}/${{ env.API_PROJECT }}/obj/${{ env.CONFIGURATION }}/Package/${{ env.API_PROJECT }}.zip
           retention-days: 1
 
   build-portal:
@@ -76,13 +76,13 @@ jobs:
         run: msbuild "${{ env.WORKING_DIRECTORY }}\${{ env.PORTAL_PROJECT }}\${{ env.PORTAL_PROJECT }}.csproj" /p:Configuration=${{ env.CONFIGURATION }} /p:Platform="AnyCPU"
 
       - name: Publish Portal
-        run: msbuild "${{ env.WORKING_DIRECTORY }}\${{ env.PORTAL_PROJECT }}\${{ env.PORTAL_PROJECT }}.csproj" /p:Configuration=${{ env.CONFIGURATION }} /p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:PublishUrl="${{ env.WORKING_DIRECTORY }}\${{ env.PORTAL_PROJECT }}\publish"
+        run: msbuild "${{ env.WORKING_DIRECTORY }}\${{ env.PORTAL_PROJECT }}\${{ env.PORTAL_PROJECT }}.csproj" /p:Configuration=${{ env.CONFIGURATION }} /p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: portal-artifact
-          path: ${{ env.WORKING_DIRECTORY }}/portal-artifact.zip
+          path: ${{ env.WORKING_DIRECTORY }}/${{ env.PORTAL_PROJECT }}/obj/${{ env.CONFIGURATION }}/Package/${{ env.PORTAL_PROJECT }}.zip
           retention-days: 1
 
   build-database:
@@ -103,7 +103,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: database-artifact
-          path: ${{ env.WORKING_DIRECTORY }}/${{ env.DATABASE_PROJECT }}/bin/${{ env.CONFIGURATION }}/*.dacpac
+          path: ${{ env.WORKING_DIRECTORY }}/${{ env.DATABASE_PROJECT }}/bin/Output/*.dacpac
           retention-days: 1
 
   scan-code:
