@@ -133,7 +133,7 @@ jobs:
   deploy-api-test:
     runs-on: windows-latest
     timeout-minutes: 30
-    needs: build-api
+    needs: scan-code
     environment: test
     if: contains(github.ref, 'dev/')
 
@@ -156,7 +156,7 @@ jobs:
           az webapp deployment source config-zip `
             --resource-group ${{ vars.AZURE_RESOURCEGROUP_NAME }} `
             --name ${{ vars.AZURE_API_APPSERVICE_NAME }} `
-            --src-path ./artifact/api-artifact.zip
+            --src ./artifact/api-artifact.zip
 
       - name: Verify API deployment
         run: |
@@ -168,7 +168,7 @@ jobs:
   # deploy-portal-test:
   #   runs-on: windows-latest
   #   timeout-minutes: 30
-  #   needs: build-portal
+  #   needs: scan-code
   #   environment: test
   #   if: contains(github.ref, 'dev/')
 
@@ -203,7 +203,7 @@ jobs:
   # deploy-database-test:
   #   runs-on: windows-latest
   #   timeout-minutes: 30
-  #   needs: build-database
+  #   needs: scan-code
   #   environment: test
 
   #   steps:
