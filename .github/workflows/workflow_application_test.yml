@@ -142,7 +142,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: api-artifact
-          path: ./artifact
+          path: ${{ env.WORKING_DIRECTORY }}/artifact
 
       - name: Log in with Azure
         uses: azure/login@v2
@@ -156,7 +156,7 @@ jobs:
           az webapp deploy `
             --resource-group ${{ vars.AZURE_RESOURCEGROUP_NAME }} `
             --name ${{ vars.AZURE_API_APPSERVICE_NAME }} `
-            --src-path ./artifact/api-artifact.zip `
+            --src-path ${{ env.WORKING_DIRECTORY }}/artifact/api-artifact.zip `
             --type zip
 
       - name: Verify API deployment
@@ -178,7 +178,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: portal-artifact
-          path: ./artifact
+          path: ${{ env.WORKING_DIRECTORY }}/artifact
 
       - name: Log in with Azure
         uses: azure/login@v2
@@ -192,7 +192,7 @@ jobs:
           az webapp deploy `
             --resource-group ${{ vars.AZURE_RESOURCEGROUP_NAME }} `
             --name ${{ vars.AZURE_PORTAL_APPSERVICE_NAME }} `
-            --src-path ./artifact/portal-artifact.zip
+            --src-path ${{ env.WORKING_DIRECTORY }}/artifact/portal-artifact.zip `
             --type zip
 
       - name: Verify Portal deployment
