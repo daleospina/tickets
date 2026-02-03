@@ -153,10 +153,11 @@ jobs:
 
       - name: Deploy API to Azure App Service
         run: |
-          az webapp deployment source config-zip `
+          az webapp deploy `
             --resource-group ${{ vars.AZURE_RESOURCEGROUP_NAME }} `
             --name ${{ vars.AZURE_API_APPSERVICE_NAME }} `
-            --src ./artifact/api-artifact.zip
+            --src-path ./artifact/api-artifact.zip `
+            --type zip
 
       - name: Verify API deployment
         run: |
