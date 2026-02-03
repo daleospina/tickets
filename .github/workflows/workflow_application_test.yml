@@ -166,40 +166,41 @@ jobs:
             --name ${{ vars.AZURE_API_APPSERVICE_NAME }} `
             --query state
 
-  # deploy-portal-test:
-  #   runs-on: windows-latest
-  #   timeout-minutes: 30
-  #   needs: scan-code
-  #   environment: test
-  #   if: contains(github.ref, 'dev/')
+  deploy-portal-test:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    needs: scan-code
+    environment: test
+    if: contains(github.ref, 'dev/')
 
-  #   steps:
-  #     - name: Download artifact
-  #       uses: actions/download-artifact@v4
-  #       with:
-  #         name: portal-build
-  #         path: ./artifact
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: portal-artifact
+          path: ./artifact
 
-  #     - name: Log in with Azure
-  #       uses: azure/login@v2
-  #       with:
-  #         client-id: ${{ secrets.AZURE_CLIENT_ID }}
-  #         tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-  #         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      - name: Log in with Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-  #     - name: Deploy Portal to Azure App Service
-  #       run: |
-  #         az webapp deployment source config-zip `
-  #           --resource-group ${{ vars.AZURE_RESOURCEGROUP_NAME }} `
-  #           --name ${{ vars.AZURE_PORTAL_APPSERVICE_NAME }} `
-  #           --src-path ./artifact/portal-artifact.zip
+      - name: Deploy Portal to Azure App Service
+        run: |
+          az webapp deploy `
+            --resource-group ${{ vars.AZURE_RESOURCEGROUP_NAME }} `
+            --name ${{ vars.AZURE_PORTAL_APPSERVICE_NAME }} `
+            --src-path ./artifact/portal-artifact.zip
+            --type zip
 
-  #     - name: Verify Portal deployment
-  #       run: |
-  #         az webapp show `
-  #           --resource-group ${{ vars.AZURE_RESOURCEGROUP_NAME }} `
-  #           --name ${{ vars.AZURE_PORTAL_APPSERVICE_NAME }} `
-  #           --query state
+      - name: Verify Portal deployment
+        run: |
+          az webapp show `
+            --resource-group ${{ vars.AZURE_RESOURCEGROUP_NAME }} `
+            --name ${{ vars.AZURE_PORTAL_APPSERVICE_NAME }} `
+            --query state
 
   # deploy-database-test:
   #   runs-on: windows-latest
