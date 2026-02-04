@@ -208,41 +208,44 @@ jobs:
             --name ${{ vars.AZURE_PORTAL_APPSERVICE_NAME }} `
             --query state
 
-  # deploy-database-test:
-  #   runs-on: windows-latest
-  #   timeout-minutes: 30
-  #   needs: scan-code
-  #   environment: test
+  deploy-database-test:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    needs: scan-code
+    environment: test
 
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-  #     - name: Download DACPAC artifact
-  #       uses: actions/download-artifact@v4
-  #       with:
-  #         name: database-build
-  #         path: ./database-artifact
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: database-artifact
+          path: ${{ env.WORKING_DIRECTORY }}/artifact
 
-  #     - name: Log in with Azure
-  #       uses: azure/login@v2
-  #       with:
-  #         client-id: ${{ secrets.AZURE_CLIENT_ID }}
-  #         tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-  #         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      - name: Log in with Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-  #     - name: Azure SQL Deploy
-  #       uses: Azure/sql-action@v2.3
-  #       with:
-  #         connection-string: '${{ vars.AZURE_SQL_CONNECTION_STRING }}'
-  #         path: './DBADirectory.dacpac'
-  #         action: publish
-  #         arguments: '/p:DropObjectsNotInSource=true'
+      - name: List downloaded Database artifact files
+        run: dir ${{ env.WORKING_DIRECTORY }}\artifact
 
-  #     - name: Verify database deployment
-  #       run: |
-  #         az sql db show `
-  #           --resource-group ${{ vars.AZURE_RESOURCEGROUP_NAME }} `
-  #           --server ${{ vars.AZURE_SQL_SERVER_NAME }} `
-  #           --name ${{ vars.AZURE_SQL_DATABASE_NAME }} `
-  #           --query status
+      - name: Azure SQL Deploy
+        uses: Azure/sql-action@v2.3
+        with:
+          connection-string: '${{ vars.AZURE_SQL_CONNECTION_STRING }}'
+          path: ${{ env.WORKING_DIRECTORY }}\artifact\${{ env.DATABASE_PROJECT }}.dacpac
+          action: publish
+          arguments: '/p:DropObjectsNotInSource=true'
+
+      - name: Verify database deployment
+        run: |
+          az sql db show `
+            --resource-group ${{ vars.AZURE_RESOURCEGROUP_NAME }} `
+            --server ${{ vars.AZURE_SQL_SERVER_NAME }} `
+            --name ${{ vars.AZURE_SQL_DATABASE_NAME }} `
+            --query status
