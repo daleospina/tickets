@@ -241,7 +241,7 @@ jobs:
           path: ${{ env.WORKING_DIRECTORY }}\artifact\${{ env.DATABASE_PROJECT }}.dacpac
           action: publish
           arguments: >
-            '/p:DropObjectsNotInSource=true'
+            /p:DropObjectsNotInSource=true
             /p:ExcludeObjectTypes=Users;Logins;RoleMembership
 
       - name: Verify database deployment
