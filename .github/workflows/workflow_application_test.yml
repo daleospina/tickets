@@ -240,7 +240,9 @@ jobs:
           connection-string: '${{ vars.AZURE_SQL_CONNECTION_STRING }}'
           path: ${{ env.WORKING_DIRECTORY }}\artifact\${{ env.DATABASE_PROJECT }}.dacpac
           action: publish
-          arguments: '/p:DropObjectsNotInSource=true'
+          arguments: >
+            '/p:DropObjectsNotInSource=true'
+            /p:ExcludeObjectTypes=Users;Logins;RoleMembership
 
       - name: Verify database deployment
         run: |
