@@ -47,28 +47,17 @@ jobs:
 
       - name: Publish API
         run: msbuild "${{ env.WORKING_DIRECTORY }}\${{ env.API_PROJECT }}\${{ env.API_PROJECT }}.csproj" `
-          /t:Publish `
-          /p:Configuration=${{ env.CONFIGURATION }} `
-          /p:WebPublishMethod=FileSystem `
-          /p:PublishDir="${{ github.workspace }}\publish\" `
-          /p:DeleteExistingFiles=true `
+          /p:Configuration=Release `
+          /p:DeployOnBuild=true `
+          /p:WebPublishMethod=Package `
+          /p:PackageAsSingleFile=true `
           /p:AutoParameterizationWebConfigConnectionStrings=false
-
-      - name: Verify publish output
-        run: |
-          dir "${{ github.workspace }}\publish"
-      
-      - name: Zip published api
-        run: |
-          Compress-Archive `
-            -Path "${{ github.workspace }}\publish\*" `
-            -DestinationPath "${{ github.workspace }}\api.zip"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: api-artifact
-          path: ${{ env.WORKING_DIRECTORY }}\api.zip
+          path: ${{ env.WORKING_DIRECTORY }}\${{ env.API_PROJECT }}\obj\Release\Package\${{ env.API_PROJECT }}.zip
           retention-days: 1
 
   build-portal:
@@ -177,7 +166,7 @@ jobs:
           az webapp deploy `
             --resource-group ${{ vars.AZURE_RESOURCEGROUP_NAME }} `
             --name ${{ vars.AZURE_API_APPSERVICE_NAME }} `
-            --src-path api.zip `
+            --src-path "${{ env.API_PROJECT }}.zip" `
             --type zip
 
       - name: Verify API deployment
