@@ -50,13 +50,21 @@ jobs:
           /p:Configuration=${{ env.CONFIGURATION }} `
           /p:DeployOnBuild=true `
           /p:WebPublishMethod=FileSystem `
-          /p:PublishDir="${{ env.WORKING_DIRECTORY }}\publish\"
+          /p:PublishDir="${{ github.workspace }}\publish\" `
+          /p:DeleteExistingFiles=true `
+          /p:UseWPP_CopyWebApplication=true `
+          /p:PipelineDependsOnBuild=false `
+          /p:AutoParameterizationWebConfigConnectionStrings=false
 
+      - name: Verify publish output
+        run: |
+          dir "${{ github.workspace }}\publish"
+      
       - name: Zip published api
         run: |
           Compress-Archive `
-            -Path "${{ env.WORKING_DIRECTORY }}\publish\*" `
-            -DestinationPath "${{ env.WORKING_DIRECTORY }}\api.zip"
+            -Path "${{ github.workspace }}\publish\*" `
+            -DestinationPath "${{ github.workspace }}\api.zip"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -90,13 +98,21 @@ jobs:
           /p:Configuration=${{ env.CONFIGURATION }} `
           /p:DeployOnBuild=true `
           /p:WebPublishMethod=FileSystem `
-          /p:PublishDir="${{ env.WORKING_DIRECTORY }}\publish\"
+          /p:PublishDir="${{ github.workspace }}\publish\" `
+          /p:DeleteExistingFiles=true `
+          /p:UseWPP_CopyWebApplication=true `
+          /p:PipelineDependsOnBuild=false `
+          /p:AutoParameterizationWebConfigConnectionStrings=false
+
+      - name: Verify publish output
+        run: |
+          dir "${{ github.workspace }}\publish"
 
       - name: Zip published portal
         run: |
           Compress-Archive `
-            -Path "${{ env.WORKING_DIRECTORY }}\publish\*" `
-            -DestinationPath "${{ env.WORKING_DIRECTORY }}\portal.zip"
+            -Path "${{ github.workspace }}\publish\*" `
+            -DestinationPath "${{ github.workspace }}\portal.zip"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
