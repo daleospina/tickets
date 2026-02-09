@@ -46,13 +46,23 @@ jobs:
         run: msbuild "${{ env.WORKING_DIRECTORY }}\${{ env.API_PROJECT }}\${{ env.API_PROJECT }}.csproj" /p:Configuration=${{ env.CONFIGURATION }} /p:Platform="AnyCPU"
 
       - name: Publish API
-        run: msbuild "${{ env.WORKING_DIRECTORY }}\${{ env.API_PROJECT }}\${{ env.API_PROJECT }}.csproj" /p:Configuration=${{ env.CONFIGURATION }} /p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true
+        run: msbuild "${{ env.WORKING_DIRECTORY }}\${{ env.API_PROJECT }}\${{ env.API_PROJECT }}.csproj" `
+          /p:Configuration=${{ env.CONFIGURATION }} `
+          /p:DeployOnBuild=true `
+          /p:WebPublishMethod=FileSystem `
+          /p:PublishDir="${{ env.WORKING_DIRECTORY }}\publish\"
+
+      - name: Zip published api
+        run: |
+          Compress-Archive `
+            -Path "${{ env.WORKING_DIRECTORY }}\publish\*" `
+            -DestinationPath "${{ env.WORKING_DIRECTORY }}\api.zip"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: api-artifact
-          path: ${{ env.WORKING_DIRECTORY }}/${{ env.API_PROJECT }}/obj/${{ env.CONFIGURATION }}/Package/${{ env.API_PROJECT }}.zip
+          path: ${{ env.WORKING_DIRECTORY }}\api.zip
           retention-days: 1
 
   build-portal:
@@ -76,13 +86,23 @@ jobs:
         run: msbuild "${{ env.WORKING_DIRECTORY }}\${{ env.PORTAL_PROJECT }}\${{ env.PORTAL_PROJECT }}.csproj" /p:Configuration=${{ env.CONFIGURATION }} /p:Platform="AnyCPU"
 
       - name: Publish Portal
-        run: msbuild "${{ env.WORKING_DIRECTORY }}\${{ env.PORTAL_PROJECT }}\${{ env.PORTAL_PROJECT }}.csproj" /p:Configuration=${{ env.CONFIGURATION }} /p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true
+        run: msbuild "${{ env.WORKING_DIRECTORY }}\${{ env.PORTAL_PROJECT }}\${{ env.PORTAL_PROJECT }}.csproj" `
+          /p:Configuration=${{ env.CONFIGURATION }} `
+          /p:DeployOnBuild=true `
+          /p:WebPublishMethod=FileSystem `
+          /p:PublishDir="${{ env.WORKING_DIRECTORY }}\publish\"
+
+      - name: Zip published portal
+        run: |
+          Compress-Archive `
+            -Path "${{ env.WORKING_DIRECTORY }}\publish\*" `
+            -DestinationPath "${{ env.WORKING_DIRECTORY }}\portal.zip"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: portal-artifact
-          path: ${{ env.WORKING_DIRECTORY }}/${{ env.PORTAL_PROJECT }}/obj/${{ env.CONFIGURATION }}/Package/${{ env.PORTAL_PROJECT }}.zip
+          path: ${{ env.WORKING_DIRECTORY }}\portal.zip
           retention-days: 1
 
   build-database:
@@ -151,15 +171,12 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: List downloaded API artifact files
-        run: dir ${{ env.WORKING_DIRECTORY }}\artifact
-
       - name: Deploy API to Azure App Service
         run: |
           az webapp deploy `
             --resource-group ${{ vars.AZURE_RESOURCEGROUP_NAME }} `
             --name ${{ vars.AZURE_API_APPSERVICE_NAME }} `
-            --src-path ${{ env.WORKING_DIRECTORY }}/artifact/${{ env.API_PROJECT }}.zip `
+            --src-path api.zip `
             --type zip
 
       - name: Verify API deployment
@@ -190,15 +207,12 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: List downloaded Portal artifact files
-        run: dir ${{ env.WORKING_DIRECTORY }}\artifact
-
       - name: Deploy Portal to Azure App Service
         run: |
           az webapp deploy `
             --resource-group ${{ vars.AZURE_RESOURCEGROUP_NAME }} `
             --name ${{ vars.AZURE_PORTAL_APPSERVICE_NAME }} `
-            --src-path ${{ env.WORKING_DIRECTORY }}/artifact/${{ env.PORTAL_PROJECT }}.zip `
+            --src-path portal.zip `
             --type zip
 
       - name: Verify Portal deployment
