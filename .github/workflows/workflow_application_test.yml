@@ -93,12 +93,13 @@ jobs:
 
       - name: Publish Portal
         run: msbuild "${{ env.WORKING_DIRECTORY }}\${{ env.PORTAL_PROJECT }}\${{ env.PORTAL_PROJECT }}.csproj" `
-          /t:Publish `
-          /p:Configuration=${{ env.CONFIGURATION }} `
+          /p:Configuration=Release `
+          /p:DeployOnBuild=true `
           /p:WebPublishMethod=FileSystem `
           /p:PublishDir="${{ github.workspace }}\publish\" `
           /p:DeleteExistingFiles=true `
-          /p:AutoParameterizationWebConfigConnectionStrings=false
+          /p:AutoParameterizationWebConfigConnectionStrings=false `
+          /t:Build;_CopyWebApplication
 
       - name: Verify publish output
         run: |
