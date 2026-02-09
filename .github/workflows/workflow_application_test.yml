@@ -95,27 +95,15 @@ jobs:
         run: msbuild "${{ env.WORKING_DIRECTORY }}\${{ env.PORTAL_PROJECT }}\${{ env.PORTAL_PROJECT }}.csproj" `
           /p:Configuration=Release `
           /p:DeployOnBuild=true `
-          /p:WebPublishMethod=FileSystem `
-          /p:PublishDir="${{ github.workspace }}\publish\" `
-          /p:DeleteExistingFiles=true `
-          /p:AutoParameterizationWebConfigConnectionStrings=false `
-          "/t:Build;_CopyWebApplication"
-
-      - name: Verify publish output
-        run: |
-          dir "${{ github.workspace }}\publish"
-
-      - name: Zip published portal
-        run: |
-          Compress-Archive `
-            -Path "${{ github.workspace }}\publish\*" `
-            -DestinationPath "${{ github.workspace }}\portal.zip"
+          /p:WebPublishMethod=Package `
+          /p:PackageAsSingleFile=true `
+          /p:AutoParameterizationWebConfigConnectionStrings=false
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: portal-artifact
-          path: ${{ env.WORKING_DIRECTORY }}\portal.zip
+          path: ${{ env.WORKING_DIRECTORY }}\${{ env.PORTAL_PROJECT }}\obj\Release\Package\${{ env.PORTAL_PROJECT }}.zip
           retention-days: 1
 
   build-database:
@@ -225,7 +213,7 @@ jobs:
           az webapp deploy `
             --resource-group ${{ vars.AZURE_RESOURCEGROUP_NAME }} `
             --name ${{ vars.AZURE_PORTAL_APPSERVICE_NAME }} `
-            --src-path portal.zip `
+            --src-path "${{ env.PORTAL_PROJECT }}.zip" `
             --type zip
 
       - name: Verify Portal deployment
