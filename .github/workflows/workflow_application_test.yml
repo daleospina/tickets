@@ -47,12 +47,11 @@ jobs:
 
       - name: Publish API
         run: msbuild "${{ env.WORKING_DIRECTORY }}\${{ env.API_PROJECT }}\${{ env.API_PROJECT }}.csproj" `
-          /t:Build `
+          /t:Publish `
           /p:Configuration=${{ env.CONFIGURATION }} `
-          /p:DeployOnBuild=false `
-          /p:OutDir="${{ github.workspace }}\publish\" `
-          /p:WebProjectOutputDir="${{ github.workspace }}\publish\" `
-          /p:UseWPP_CopyWebApplication=true `
+          /p:WebPublishMethod=FileSystem `
+          /p:PublishDir="${{ github.workspace }}\publish\" `
+          /p:DeleteExistingFiles=true `
           /p:AutoParameterizationWebConfigConnectionStrings=false
 
       - name: Verify publish output
@@ -94,12 +93,11 @@ jobs:
 
       - name: Publish Portal
         run: msbuild "${{ env.WORKING_DIRECTORY }}\${{ env.PORTAL_PROJECT }}\${{ env.PORTAL_PROJECT }}.csproj" `
-          /t:Build `
+          /t:Publish `
           /p:Configuration=${{ env.CONFIGURATION }} `
-          /p:DeployOnBuild=false `
-          /p:OutDir="${{ github.workspace }}\publish\" `
-          /p:WebProjectOutputDir="${{ github.workspace }}\publish\" `
-          /p:UseWPP_CopyWebApplication=true `
+          /p:WebPublishMethod=FileSystem `
+          /p:PublishDir="${{ github.workspace }}\publish\" `
+          /p:DeleteExistingFiles=true `
           /p:AutoParameterizationWebConfigConnectionStrings=false
 
       - name: Verify publish output
