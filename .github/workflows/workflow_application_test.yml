@@ -88,23 +88,22 @@ jobs:
 
       - name: Publish Portal
         run: msbuild "${{ env.WORKING_DIRECTORY }}\${{ env.PORTAL_PROJECT }}\${{ env.PORTAL_PROJECT }}.csproj" `
-          /p:Configuration=Release `
+          /p:Configuration=Release ` 
           /p:DeployOnBuild=true `
-          /p:WebPublishMethod=Package `
-          /p:PackageAsSingleFile=true `
-          /p:AutoParameterizationWebConfigConnectionStrings=false
+          /p:DeployDefaultTarget=WebPublish `
+          /p:WebPublishMethod=FileSystem `
+          /p:publishUrl=${{ github.workspace }}\publish `
+          /p:PrecompileBeforePublish=true `
+          /p:EnableUpdateable=false
 
-      - name: Extract MSDeploy Package
-        run: |
-          Expand-Archive `
-            -Path "${{ env.WORKING_DIRECTORY }}\${{ env.PORTAL_PROJECT }}\obj\Release\Package\${{ env.PORTAL_PROJECT }}.zip" `
-            -DestinationPath "${{ github.workspace }}\extracted"
+      - name: Zip
+        run: compress-archive ${{ github.workspace }}\publish\* ${{ github.workspace }}\portal.zip
       
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: portal-artifact
-          path: ${{ env.WORKING_DIRECTORY }}\${{ env.PORTAL_PROJECT }}\obj\Release\Package\${{ env.PORTAL_PROJECT }}.zip
+          path: ${{ github.workspace }}/portal.zip
           retention-days: 1
 
   build-database:
@@ -164,7 +163,6 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: api-artifact
-          path: ${{ env.WORKING_DIRECTORY }}/artifact
 
       - name: Log in with Azure
         uses: azure/login@v2
@@ -172,14 +170,13 @@ jobs:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-
-      - name: Deploy API to Azure App Service
-        run: |
-          az webapp deploy `
-            --resource-group ${{ vars.AZURE_RESOURCEGROUP_NAME }} `
-            --name ${{ vars.AZURE_API_APPSERVICE_NAME }} `
-            --src-path "${{ env.API_PROJECT }}.zip" `
-            --type zip
+          
+      - name: Deploy to App Service
+        uses: azure/webapps-deploy@v2
+        with:
+          resource-group-name: ${{ vars.AZURE_RESOURCEGROUP_NAME }}
+          app-name: ${{ vars.AZURE_API_APPSERVICE_NAME }}
+          package: ${{ github.workspace }}\api-artifact.zip
 
       - name: Verify API deployment
         run: |
@@ -200,7 +197,6 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: portal-artifact
-          path: ${{ env.WORKING_DIRECTORY }}/artifact
 
       - name: Log in with Azure
         uses: azure/login@v2
@@ -209,13 +205,12 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Deploy Portal to Azure App Service
-        run: |
-          az webapp deploy `
-            --resource-group ${{ vars.AZURE_RESOURCEGROUP_NAME }} `
-            --name ${{ vars.AZURE_PORTAL_APPSERVICE_NAME }} `
-            --src-path "${{ env.PORTAL_PROJECT }}.zip" `
-            --type zip
+      - name: Deploy to App Service
+        uses: azure/webapps-deploy@v2
+        with:
+          resource-group-name: ${{ vars.AZURE_RESOURCEGROUP_NAME }}
+          app-name: ${{ vars.AZURE_PORTAL_APPSERVICE_NAME }}
+          package: ${{ github.workspace }}\portal-artifact.zip
 
       - name: Verify Portal deployment
         run: |
