@@ -24,10 +24,10 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
       - name: Build bicep
         run: az bicep build --file ${{ env.TEMPLATE_FILE }}
   
-
   create-resource-group-in-test:
     runs-on: ubuntu-latest
     timeout-minutes: 30

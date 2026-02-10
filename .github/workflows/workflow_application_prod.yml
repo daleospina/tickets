@@ -42,17 +42,24 @@ jobs:
       - name: Restore NuGet packages
         run: nuget restore "${{ env.WORKING_DIRECTORY }}\cicloso.tickets.sln"
 
-      - name: Build API project
-        run: msbuild "${{ env.WORKING_DIRECTORY }}\${{ env.API_PROJECT }}\${{ env.API_PROJECT }}.csproj" /p:Configuration=${{ env.CONFIGURATION }} /p:Platform="AnyCPU"
+      - name: Build api
+        run: msbuild "${{ env.WORKING_DIRECTORY }}\${{ env.API_PROJECT }}\${{ env.API_PROJECT }}.csproj" `
+          /p:Configuration=Release ` 
+          /p:DeployOnBuild=true `
+          /p:WebPublishMethod=FileSystem `
+          /p:publishUrl=${{ github.workspace }}\publish `
+          /p:PrecompileBeforePublish=true `
+          /p:EnableUpdateable=false
 
-      - name: Publish API
-        run: msbuild "${{ env.WORKING_DIRECTORY }}\${{ env.API_PROJECT }}\${{ env.API_PROJECT }}.csproj" /p:Configuration=${{ env.CONFIGURATION }} /p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true  /p:PublishUrl="${{ env.WORKING_DIRECTORY }}\${{ env.API_PROJECT }}\publish"
+      - name: Compress artifact api
+        run: compress-archive ${{ github.workspace }}\publish\* ${{ github.workspace }}\api.zip
 
-      - name: Upload artifact
+
+      - name: Upload artifact api
         uses: actions/upload-artifact@v4
         with:
           name: api-artifact
-          path: ${{ env.WORKING_DIRECTORY }}/api-artifact.zip
+          path: ${{ github.workspace }}/api.zip
           retention-days: 1
 
   build-portal:
@@ -72,17 +79,23 @@ jobs:
       - name: Restore NuGet packages
         run: nuget restore "${{ env.WORKING_DIRECTORY }}\cicloso.tickets.sln"
 
-      - name: Build Portal project
-        run: msbuild "${{ env.WORKING_DIRECTORY }}\${{ env.PORTAL_PROJECT }}\${{ env.PORTAL_PROJECT }}.csproj" /p:Configuration=${{ env.CONFIGURATION }} /p:Platform="AnyCPU"
+      - name: Build portal
+        run: msbuild "${{ env.WORKING_DIRECTORY }}\${{ env.PORTAL_PROJECT }}\${{ env.PORTAL_PROJECT }}.csproj" `
+          /p:Configuration=Release ` 
+          /p:DeployOnBuild=true `
+          /p:WebPublishMethod=FileSystem `
+          /p:publishUrl=${{ github.workspace }}\publish `
+          /p:PrecompileBeforePublish=true `
+          /p:EnableUpdateable=false
 
-      - name: Publish Portal
-        run: msbuild "${{ env.WORKING_DIRECTORY }}\${{ env.PORTAL_PROJECT }}\${{ env.PORTAL_PROJECT }}.csproj" /p:Configuration=${{ env.CONFIGURATION }} /p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:PublishUrl="${{ env.WORKING_DIRECTORY }}\${{ env.PORTAL_PROJECT }}\publish"
-
-      - name: Upload artifact
+      - name: Compress artifact portal
+        run: compress-archive ${{ github.workspace }}\publish\* ${{ github.workspace }}\portal.zip
+      
+      - name: Upload artifact portal
         uses: actions/upload-artifact@v4
         with:
           name: portal-artifact
-          path: ${{ env.WORKING_DIRECTORY }}/portal-artifact.zip
+          path: ${{ github.workspace }}/portal.zip
           retention-days: 1
 
   build-database:
@@ -96,14 +109,14 @@ jobs:
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v1.3.1
 
-      - name: Build SQL Server Database project
+      - name: Build database
         run: msbuild "${{ env.WORKING_DIRECTORY }}\${{ env.DATABASE_PROJECT }}\${{ env.DATABASE_PROJECT }}.sqlproj" /p:Configuration=${{ env.CONFIGURATION }}
 
-      - name: Upload DACPAC artifact
+      - name: Upload artifact database
         uses: actions/upload-artifact@v4
         with:
           name: database-artifact
-          path: ${{ env.WORKING_DIRECTORY }}/${{ env.DATABASE_PROJECT }}/bin/${{ env.CONFIGURATION }}/*.dacpac
+          path: ${{ env.WORKING_DIRECTORY }}/${{ env.DATABASE_PROJECT }}/bin/Output/*.dacpac
           retention-days: 1
 
   scan-code:
@@ -130,119 +143,3 @@ jobs:
             -Dsonar.verbose=true
 
   # ========== TEST ENVIRONMENT DEPLOYMENT ==========
-  # deploy-api-test:
-  #   runs-on: windows-latest
-  #   timeout-minutes: 30
-  #   needs: build-api
-  #   environment: test
-  #   if: contains(github.ref, 'dev/')
-
-  #   steps:
-  #     - name: Download artifact
-  #       uses: actions/download-artifact@v4
-  #       with:
-  #         name: api-artifact
-  #         path: ./artifact
-
-  #     - name: Log in with Azure
-  #       uses: azure/login@v2
-  #       with:
-  #         client-id: ${{ secrets.AZURE_CLIENT_ID }}
-  #         tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-  #         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      
-  #     - name: Deploy App 1 to Azure
-  #       uses: azure/webapps-deploy@v2
-  #       with:
-  #         app-name: 'YourAppServiceName1' # Replace with your Azure App Service name for App 1
-
-  #         publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE_APP1 }} # Use the secret you created
-  #         package: 'site_output_app1'
-
-  #     - name: Deploy API to Azure App Service
-  #       run: |
-  #         az webapp deployment source config-zip `
-  #           --resource-group ${{ vars.AZURE_RESOURCEGROUP_NAME }} `
-  #           --name ${{ vars.AZURE_API_APPSERVICE_NAME }} `
-  #           --src-path ./artifact/api-artifact.zip
-
-  #     - name: Verify API deployment
-  #       run: |
-  #         az webapp show `
-  #           --resource-group ${{ vars.AZURE_RESOURCEGROUP_NAME }} `
-  #           --name ${{ vars.AZURE_API_APPSERVICE_NAME }} `
-  #           --query state
-
-  # deploy-portal-test:
-  #   runs-on: windows-latest
-  #   timeout-minutes: 30
-  #   needs: build-portal
-  #   environment: test
-  #   if: contains(github.ref, 'dev/')
-
-  #   steps:
-  #     - name: Download artifact
-  #       uses: actions/download-artifact@v4
-  #       with:
-  #         name: portal-build
-  #         path: ./artifact
-
-  #     - name: Log in with Azure
-  #       uses: azure/login@v2
-  #       with:
-  #         client-id: ${{ secrets.AZURE_CLIENT_ID }}
-  #         tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-  #         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-
-  #     - name: Deploy Portal to Azure App Service
-  #       run: |
-  #         az webapp deployment source config-zip `
-  #           --resource-group ${{ vars.AZURE_RESOURCEGROUP_NAME }} `
-  #           --name ${{ vars.AZURE_PORTAL_APPSERVICE_NAME }} `
-  #           --src-path ./artifact/portal-artifact.zip
-
-  #     - name: Verify Portal deployment
-  #       run: |
-  #         az webapp show `
-  #           --resource-group ${{ vars.AZURE_RESOURCEGROUP_NAME }} `
-  #           --name ${{ vars.AZURE_PORTAL_APPSERVICE_NAME }} `
-  #           --query state
-
-  # deploy-database-test:
-  #   runs-on: windows-latest
-  #   timeout-minutes: 30
-  #   needs: build-database
-  #   environment: test
-
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
-
-  #     - name: Download DACPAC artifact
-  #       uses: actions/download-artifact@v4
-  #       with:
-  #         name: database-build
-  #         path: ./database-artifact
-
-  #     - name: Log in with Azure
-  #       uses: azure/login@v2
-  #       with:
-  #         client-id: ${{ secrets.AZURE_CLIENT_ID }}
-  #         tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-  #         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-
-  #     - name: Azure SQL Deploy
-  #       uses: Azure/sql-action@v2.3
-  #       with:
-  #         connection-string: '${{ vars.AZURE_SQL_CONNECTION_STRING }}'
-  #         path: './DBADirectory.dacpac'
-  #         action: publish
-  #         arguments: '/p:DropObjectsNotInSource=true'
-
-  #     - name: Verify database deployment
-  #       run: |
-  #         az sql db show `
-  #           --resource-group ${{ vars.AZURE_RESOURCEGROUP_NAME }} `
-  #           --server ${{ vars.AZURE_SQL_SERVER_NAME }} `
-  #           --name ${{ vars.AZURE_SQL_DATABASE_NAME }} `
-  #           --query status

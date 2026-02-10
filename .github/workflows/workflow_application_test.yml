@@ -42,24 +42,20 @@ jobs:
       - name: Restore NuGet packages
         run: nuget restore "${{ env.WORKING_DIRECTORY }}\cicloso.tickets.sln"
 
-      # - name: Build API project
-      #   run: msbuild "${{ env.WORKING_DIRECTORY }}\${{ env.API_PROJECT }}\${{ env.API_PROJECT }}.csproj" /p:Configuration=${{ env.CONFIGURATION }} /p:Platform="AnyCPU"
-
-      - name: Publish API
+      - name: Build api
         run: msbuild "${{ env.WORKING_DIRECTORY }}\${{ env.API_PROJECT }}\${{ env.API_PROJECT }}.csproj" `
           /p:Configuration=Release ` 
           /p:DeployOnBuild=true `
-          /p:DeployDefaultTarget=WebPublish `
           /p:WebPublishMethod=FileSystem `
           /p:publishUrl=${{ github.workspace }}\publish `
           /p:PrecompileBeforePublish=true `
           /p:EnableUpdateable=false
 
-      - name: Zip
+      - name: Compress artifact api
         run: compress-archive ${{ github.workspace }}\publish\* ${{ github.workspace }}\api.zip
 
 
-      - name: Upload artifact
+      - name: Upload artifact api
         uses: actions/upload-artifact@v4
         with:
           name: api-artifact
@@ -83,23 +79,19 @@ jobs:
       - name: Restore NuGet packages
         run: nuget restore "${{ env.WORKING_DIRECTORY }}\cicloso.tickets.sln"
 
-      # - name: Build Portal project
-      #   run: msbuild "${{ env.WORKING_DIRECTORY }}\${{ env.PORTAL_PROJECT }}\${{ env.PORTAL_PROJECT }}.csproj" /p:Configuration=${{ env.CONFIGURATION }} /p:Platform="AnyCPU"
-
-      - name: Publish Portal
+      - name: Build portal
         run: msbuild "${{ env.WORKING_DIRECTORY }}\${{ env.PORTAL_PROJECT }}\${{ env.PORTAL_PROJECT }}.csproj" `
           /p:Configuration=Release ` 
           /p:DeployOnBuild=true `
-          /p:DeployDefaultTarget=WebPublish `
           /p:WebPublishMethod=FileSystem `
           /p:publishUrl=${{ github.workspace }}\publish `
           /p:PrecompileBeforePublish=true `
           /p:EnableUpdateable=false
 
-      - name: Zip
+      - name: Compress artifact portal
         run: compress-archive ${{ github.workspace }}\publish\* ${{ github.workspace }}\portal.zip
       
-      - name: Upload artifact
+      - name: Upload artifact portal
         uses: actions/upload-artifact@v4
         with:
           name: portal-artifact
@@ -117,10 +109,10 @@ jobs:
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v1.3.1
 
-      - name: Build SQL Server Database project
+      - name: Build database
         run: msbuild "${{ env.WORKING_DIRECTORY }}\${{ env.DATABASE_PROJECT }}\${{ env.DATABASE_PROJECT }}.sqlproj" /p:Configuration=${{ env.CONFIGURATION }}
 
-      - name: Upload DACPAC artifact
+      - name: Upload artifact database
         uses: actions/upload-artifact@v4
         with:
           name: database-artifact
