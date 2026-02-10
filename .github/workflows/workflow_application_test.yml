@@ -47,19 +47,23 @@ jobs:
 
       - name: Publish API
         run: msbuild "${{ env.WORKING_DIRECTORY }}\${{ env.API_PROJECT }}\${{ env.API_PROJECT }}.csproj" `
-          /p:Configuration=Release `
+          /p:Configuration=Release ` 
           /p:DeployOnBuild=true `
-          /p:WebPublishMethod=Package `
-          /p:PackageAsSingleFile=true `
-          /p:AutoParameterizationWebConfigConnectionStrings=false `
-          /p:PackageLocation=${{ github.workspace }}/publish
+          /p:DeployDefaultTarget=WebPublish `
+          /p:WebPublishMethod=FileSystem `
+          /p:publishUrl=${{ github.workspace }}\publish `
+          /p:PrecompileBeforePublish=true `
+          /p:EnableUpdateable=false
+
+      - name: Zip
+        run: compress-archive ${{ github.workspace }}\publish\* ${{ github.workspace }}\api.zip
 
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: api-artifact
-          path: ${{ github.workspace }}/publish/**/${{ env.API_PROJECT }}.zip
+          path: ${{ github.workspace }}/api.zip
           retention-days: 1
 
   build-portal:
