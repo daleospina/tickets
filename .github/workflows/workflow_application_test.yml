@@ -59,7 +59,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: api-artifact
-          path: ${{ github.workspace }}/publish/**/${{ env.WORKING_DIRECTORY }}\${{ env.API_PROJECT }}\obj\Release\Package\${{ env.API_PROJECT }}.zip
+          path: ${{ github.workspace }}/publish/**/${{ env.API_PROJECT }}.zip
           retention-days: 1
 
   build-portal:
