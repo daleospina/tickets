@@ -163,6 +163,10 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: api-artifact
+          path: api-artifact
+
+      - name: List API files
+        run: dir api-artifact
 
       - name: Log in with Azure
         uses: azure/login@v2
@@ -176,7 +180,7 @@ jobs:
         with:
           resource-group-name: ${{ vars.AZURE_RESOURCEGROUP_NAME }}
           app-name: ${{ vars.AZURE_API_APPSERVICE_NAME }}
-          package: ${{ github.workspace }}\api-artifact\api.zip
+          package: api-artifact/api.zip
 
       - name: Verify API deployment
         run: |
@@ -197,6 +201,10 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: portal-artifact
+          path: portal-artifact
+
+      - name: List PORTAL files
+        run: dir portal-artifact
 
       - name: Log in with Azure
         uses: azure/login@v2
@@ -210,7 +218,7 @@ jobs:
         with:
           resource-group-name: ${{ vars.AZURE_RESOURCEGROUP_NAME }}
           app-name: ${{ vars.AZURE_PORTAL_APPSERVICE_NAME }}
-          package: ${{ github.workspace }}\portal-artifact\portal.zip
+          package: portal-artifact/portal.zip
 
       - name: Verify Portal deployment
         run: |
