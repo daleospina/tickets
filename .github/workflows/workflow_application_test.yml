@@ -265,14 +265,14 @@ jobs:
             --name ${{ vars.AZURE_SQL_DATABASE_NAME }} `
             --query status
 
-  validate-perfomance-test:
+  validate-perfomance:
     runs-on: ubuntu-latest
     needs: [deploy-api-test, deploy-portal-test, deploy-database-test]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Audit URLs
+      - name: Lighthouse scan
         uses: treosh/lighthouse-ci-action@v12
         with:
           urls: |
@@ -282,3 +282,15 @@ jobs:
             https://app-tickets-app-test-gwjeyl.azurewebsites.net/Theater
           uploadArtifacts: true # save results as an action artifacts
           temporaryPublicStorage: true # upload lighthouse report to the temporary storage
+    
+  validate-security:
+    runs-on: ubuntu-latest
+    needs: [validate-perfomance]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: ZAP Scan
+        uses: zaproxy/action-full-scan@v0.13.0
+        with:
+          target: 'https://app-tickets-app-test-gwjeyl.azurewebsites.net/'
