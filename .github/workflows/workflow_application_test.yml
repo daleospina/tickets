@@ -176,7 +176,7 @@ jobs:
         with:
           resource-group-name: ${{ vars.AZURE_RESOURCEGROUP_NAME }}
           app-name: ${{ vars.AZURE_API_APPSERVICE_NAME }}
-          package: ${{ github.workspace }}\api-artifact.zip
+          package: ${{ github.workspace }}\api-artifact\api.zip
 
       - name: Verify API deployment
         run: |
@@ -210,7 +210,7 @@ jobs:
         with:
           resource-group-name: ${{ vars.AZURE_RESOURCEGROUP_NAME }}
           app-name: ${{ vars.AZURE_PORTAL_APPSERVICE_NAME }}
-          package: ${{ github.workspace }}\portal-artifact.zip
+          package: ${{ github.workspace }}\portal-artifact\portal.zip
 
       - name: Verify Portal deployment
         run: |
