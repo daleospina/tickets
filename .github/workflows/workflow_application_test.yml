@@ -51,13 +51,15 @@ jobs:
           /p:DeployOnBuild=true `
           /p:WebPublishMethod=Package `
           /p:PackageAsSingleFile=true `
-          /p:AutoParameterizationWebConfigConnectionStrings=false
+          /p:AutoParameterizationWebConfigConnectionStrings=false `
+          /p:PackageLocation=${{ github.workspace }}/publish
+
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: api-artifact
-          path: ${{ env.WORKING_DIRECTORY }}\${{ env.API_PROJECT }}\obj\Release\Package\${{ env.API_PROJECT }}.zip
+          path: ${{ github.workspace }}/publish/**/${{ env.WORKING_DIRECTORY }}\${{ env.API_PROJECT }}\obj\Release\Package\${{ env.API_PROJECT }}.zip
           retention-days: 1
 
   build-portal:
@@ -88,6 +90,12 @@ jobs:
           /p:PackageAsSingleFile=true `
           /p:AutoParameterizationWebConfigConnectionStrings=false
 
+      - name: Extract MSDeploy Package
+        run: |
+          Expand-Archive `
+            -Path "${{ env.WORKING_DIRECTORY }}\${{ env.PORTAL_PROJECT }}\obj\Release\Package\${{ env.PORTAL_PROJECT }}.zip" `
+            -DestinationPath "${{ github.workspace }}\extracted"
+      
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
